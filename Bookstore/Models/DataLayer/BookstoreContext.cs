@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 
 namespace Bookstore.Models
 {
@@ -39,6 +43,34 @@ namespace Bookstore.Models
             modelBuilder.ApplyConfiguration(new SeedBooks());
             modelBuilder.ApplyConfiguration(new SeedAuthors());
             modelBuilder.ApplyConfiguration(new SeedBookAuthors());
+        }
+
+        public static async Task CreateAdminUser(IServiceProvider serviceprovider)
+        {
+            UserManager<User> userManager =
+                serviceprovider.GetRequiredService<UserManager<User>>();
+            RoleManager<IdentityRole> roleManager =
+                serviceprovider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            string username = "admin";
+            string password = "Sesame";
+            string roleName = "Admin";
+
+            if (await roleManager.FindByNameAsync(roleName) == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+
+            if (await userManager.FindByNameAsync(username) == null)
+            {
+                User user = new User { UserName = username };
+                var result = await userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, roleName);
+                }
+
+            }
         }
     }
 }

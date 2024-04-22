@@ -75,6 +75,8 @@ namespace Bookstore
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}/{slug?}");
             });
+
+            BookstoreContext.CreateAdminUser(app.ApplicationServices).Wait();
         }
     }
 }
