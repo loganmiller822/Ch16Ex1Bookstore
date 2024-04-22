@@ -26,20 +26,26 @@ namespace Bookstore.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-
             if (ModelState.IsValid)
             {
-                var user = new Bookstore.Models.User { UserName = model.Username };
+                var user = new User
+                {
+                    UserName = model.Username,
+                    Email = model.Email,
+                    Firstname = model.FirstName,
+                    Lastname = model.LastName
+                };
+
                 var result = await userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, isPersistent : false);
+                    await signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
                 }
                 else
                 {
-                    foreach (var error in result.Errors) 
+                    foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError("", error.Description);
                     }
